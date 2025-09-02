@@ -4,4 +4,10 @@
 # For emoji detection and extraction
 emoji>=2.14.0
 
+# For OpenAI GPT-5 integration
+openai>=1.0.0
+
+# For loading environment variables from .env file
+python-dotenv>=1.0.0
+
 # No external dependencies required for other scripts - uses only Python standard library
