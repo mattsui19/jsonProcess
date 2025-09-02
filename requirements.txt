@@ -1,2 +1,7 @@
-# No external dependencies required - uses only Python standard library
+# Python dependencies for data processing scripts
 # Python 3.6+ required for f-strings and type hints
+
+# For emoji detection and extraction
+emoji>=2.14.0
+
+# No external dependencies required for other scripts - uses only Python standard library
