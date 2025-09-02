@@ -202,7 +202,7 @@ def count_tokens(text):
     return len(words)
 
 
-def normalize_record(record, schema_version="1.0"):
+def normalize_record(record):
     """Normalize a single record with all transformations."""
     
     # Normalize timestamp
@@ -251,7 +251,6 @@ def normalize_record(record, schema_version="1.0"):
         "contents": final_content,
         "attachments": record.get('attachments', []),
         "source_device_id": "unknown",
-        "schema_version": schema_version,
         "fingerprint": stable_id,
         "extracted_data": {
             "emojis": emojis,
@@ -285,7 +284,7 @@ def split_concatenated_json(json_content):
     return records
 
 
-def process_original_file(input_file, output_file, schema_version="1.0"):
+def process_original_file(input_file, output_file):
     """Process original concatenated JSON file directly to cleaned JSONL."""
     
     try:
@@ -314,7 +313,7 @@ def process_original_file(input_file, output_file, schema_version="1.0"):
     
     for i, record in enumerate(records):
         try:
-            normalized_record = normalize_record(record, schema_version)
+            normalized_record = normalize_record(record)
             normalized_records.append(normalized_record)
         except Exception as e:
             print(f"Error processing record {i+1}: {e}")
@@ -335,7 +334,7 @@ def process_original_file(input_file, output_file, schema_version="1.0"):
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: python process_original.py <original_file.json> <output_file.jsonl>")
+        print("Usage: python process_original.py <input_file.json> <output_file.jsonl>")
         print("Example: python process_original.py +19178268897.json +19178268897_cleaned.jsonl")
         sys.exit(1)
     

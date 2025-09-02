@@ -1,112 +1,155 @@
-# JSON Message Normalization Script
+# JSON Data Processing Pipeline
 
-This script normalizes and validates JSON message records according to a consistent schema.
+A streamlined pipeline for processing concatenated JSON message data, cleaning it, and segmenting conversations.
 
-## Features
-
-- **Timestamp Conversion**: Converts timestamps to ISO-8601 UTC format (e.g., "2025-02-27T23:20:21Z")
-- **GUID Validation**: Ensures each record has a unique ID, creating SHA256 fingerprints if missing
-- **Sender Normalization**: Maps "Me" to `{"me": true}` and preserves E.164 phone numbers
-- **Control Character Stripping**: Removes control characters while preserving newlines and tabs
-- **UTF-8 Enforcement**: Ensures proper text encoding
-- **Idempotency Fields**: Adds fingerprint hashes for deduplication
-- **Schema Versioning**: Includes schema version and source device tracking
-- **JSONL Output**: Outputs one JSON object per line for easy processing
-
-## Usage
-
-### Basic Usage
+## 🚀 Quick Start
 
 ```bash
-python normalize_json.py +19178268897.json
+# Clean and normalize the data
+python clean_data.py +19178268897.json
+
+# Segment conversations
+python segment_conversations.py +19178268897_cleaned.jsonl +19178268897_segmented.jsonl
+
+# Analyze segments
+python analyze_segments.py +19178268897_segmented.jsonl
 ```
 
-This will create `+19178268897_normalized.jsonl` as output.
+## 📁 Files
 
-### Custom Output File
+### Core Scripts
+- **`clean_data.py`** - Main wrapper script for data cleaning
+- **`process_original.py`** - Core processing logic (JSON parsing, normalization, feature extraction)
+- **`segment_conversations.py`** - Conversation segmentation by date and time gaps
+- **`analyze_segments.py`** - Analysis and insights from segmented conversations
 
-```bash
-python normalize_json.py +19178268897.json -o normalized_messages.jsonl
-```
+### Input/Output
+- **`+19178268897.json`** - Original concatenated JSON file
+- **`+19178268897_cleaned.jsonl`** - Cleaned and normalized JSONL output
+- **`+19178268897_segmented.jsonl`** - Final segmented conversations
 
-### Custom Schema Version
+### Documentation
+- **`README.md`** - This file
+- **`SEGMENTATION_SUMMARY.md`** - Detailed segmentation process documentation
+- **`requirements.txt`** - Python dependencies
 
-```bash
-python normalize_json.py +19178268897.json -v 2.0
-```
+## 🔧 Features
 
-### Help
+### Data Cleaning (`clean_data.py`)
+- ✅ Parses concatenated JSON objects
+- ✅ Normalizes timestamps to UTC ISO-8601
+- ✅ Extracts emojis and URLs into separate fields
+- ✅ Computes message-level features (token count, questions, dates, etc.)
+- ✅ Preserves all original data fields
+- ✅ Strips control characters and enforces UTF-8
 
-```bash
-python normalize_json.py --help
-```
+### Conversation Segmentation (`segment_conversations.py`)
+- ✅ Groups messages by date
+- ✅ Connects messages within 2-hour time windows
+- ✅ Creates conversation segments with metadata
+- ✅ Calculates timing statistics and gaps
 
-## Input Format
+### Analysis (`analyze_segments.py`)
+- ✅ Segment size distribution
+- ✅ Time gap analysis
+- ✅ Participant behavior patterns
+- ✅ Daily and weekly patterns
+- ✅ Conversation flow insights
 
-The script expects a file containing concatenated JSON objects (not a JSON array). Each object should have these fields:
+## 📊 Output Schema
 
+### Cleaned Messages
 ```json
 {
-  "attachments": [],
-  "contents": "Message text",
-  "guid": "5206B046-1C97-4B71-8C53-6DC57442CBA5",
-  "is_from_me": false,
-  "readtime": null,
+  "id": "unique_identifier",
+  "timestamp": "2025-02-27T18:20:21+00:00",
   "sender": "+19178268897",
-  "timestamp": "Feb 27, 2025  6:20:21 PM"
-}
-```
-
-## Output Format
-
-Each line contains a normalized JSON object with this schema:
-
-```json
-{
-  "id": "5206B046-1C97-4B71-8C53-6DC57442CBA5",
-  "timestamp": "2025-02-27T23:20:21Z",
-  "phone": "+19178268897",
-  "contents": "Message text",
-  "attachments": [],
   "is_from_me": false,
   "readtime": null,
+  "contents": "Hey",
+  "attachments": [],
   "source_device_id": "unknown",
-  "schema_version": "1.0",
-  "fingerprint": "abc123..."
+  "fingerprint": "unique_identifier",
+  "extracted_data": {
+    "emojis": [],
+    "urls": []
+  },
+  "features": {
+    "token_count": 1,
+    "character_count": 3,
+    "is_question": false,
+    "is_exclamation": false,
+    "contains_date": false,
+    "contains_place": false,
+    "contains_money": false,
+    "mentions": [],
+    "has_emojis": false,
+    "has_urls": false,
+    "emoji_count": 0,
+    "url_count": 0
+  }
 }
 ```
 
-### Field Mappings
-
-- **sender**: 
-  - `"Me"` → `{"me": true}`
-  - E.164 numbers → `{"phone": "+19178268897"}`
-  - Others → `{"other": "value"}`
-- **timestamp**: Converted to ISO-8601 UTC format
-- **id**: Uses existing `guid` or creates SHA256 hash from content
-- **fingerprint**: SHA256 hash of normalized record for deduplication
-
-## Requirements
-
-- Python 3.6 or higher
-- No external dependencies (uses only standard library)
-
-## Error Handling
-
-- Invalid JSON objects are skipped with warnings
-- Timestamp parsing errors preserve original values
-- Processing continues even if individual records fail
-- Progress updates every 1000 records
-
-## Example
-
-```bash
-# Process the file
-python normalize_json.py +19178268897.json
-
-# Check the first few lines of output
-head -5 +19178268897_normalized.jsonl | jq .
-
-# Count total records
-wc -l +19178268897_normalized.jsonl
+### Conversation Segments
+```json
+{
+  "segment_id": "segment_0001",
+  "date": "2025-02-27",
+  "start_time": "2025-02-27T18:20:21+00:00",
+  "end_time": "2025-02-27T18:20:21+00:00",
+  "message_count": 1,
+  "participants": ["+19178268897"],
+  "messages": [...],
+  "time_gaps": [],
+  "total_duration_minutes": 0,
+  "avg_gap_minutes": 0,
+  "max_gap_minutes": 0,
+  "min_gap_minutes": 0
+}
 ```
+
+## 🛠️ Requirements
+
+- Python 3.6+
+- Virtual environment (recommended)
+- Dependencies: `emoji>=2.14.0`
+
+## 📈 Performance
+
+- **Processing Speed**: ~6,000 messages in <2 minutes
+- **Memory Usage**: Line-by-line processing for large files
+- **Output Format**: JSONL for easy analysis and streaming
+
+## 🔍 Usage Examples
+
+### Basic Cleaning
+```bash
+python clean_data.py input.json
+# Creates input_cleaned.jsonl
+```
+
+### Custom Segmentation
+```bash
+python segment_conversations.py input_cleaned.jsonl output_segmented.jsonl
+```
+
+### Analysis
+```bash
+python analyze_segments.py input_segmented.jsonl
+```
+
+## 🎯 Key Benefits
+
+1. **Unified Pipeline**: Single command from raw JSON to clean data
+2. **No Schema Version**: Clean, simple output structure
+3. **Efficient Processing**: Handles large files without memory issues
+4. **Rich Features**: Comprehensive message analysis and conversation insights
+5. **Flexible Output**: JSONL format for easy integration with other tools
+
+## 📝 Notes
+
+- All timestamps are converted to UTC ISO-8601 format
+- Emojis and URLs are extracted and preserved in separate fields
+- Conversation segmentation uses a 2-hour time window (configurable)
+- The pipeline preserves all original data while adding computed features
