@@ -1,0 +1,231 @@
+{
+  "analysis_metadata": {
+    "input_file": "+19178268897_normalized.jsonl",
+    "total_records": 6129,
+    "analysis_timestamp": "2025-09-02T14:17:21.771081"
+  },
+  "message_statistics": {
+    "total_messages": 6129,
+    "total_characters": 151762,
+    "total_words": 31602,
+    "average_message_length": 24.8,
+    "average_words_per_message": 5.2
+  },
+  "sender_distribution": {
+    "phone": {
+      "count": 2673,
+      "percentage": 43.6
+    },
+    "me": {
+      "count": 3456,
+      "percentage": 56.4
+    }
+  },
+  "readtime_analysis": {
+    "overall": {
+      "total_messages_with_readtime": 2498,
+      "statistics": {
+        "average_minutes": 7.1,
+        "median_minutes": 0.0,
+        "min_minutes": 0.0,
+        "max_minutes": 1480.4
+      },
+      "distribution": {
+        "immediate_under_1min": {
+          "count": 2422,
+          "percentage": 97.0
+        },
+        "quick_1_to_5min": {
+          "count": 17,
+          "percentage": 0.7
+        },
+        "moderate_5_to_30min": {
+          "count": 25,
+          "percentage": 1.0
+        },
+        "slow_30min_to_2h": {
+          "count": 10,
+          "percentage": 0.4
+        },
+        "very_slow_over_2h": {
+          "count": 24,
+          "percentage": 1.0
+        }
+      }
+    },
+    "individual_distributions": [
+      {
+        "label": "'Me' messages",
+        "count": 7,
+        "statistics": {
+          "average_minutes": 889.8,
+          "median_minutes": 1453.0,
+          "min_minutes": 0.1,
+          "max_minutes": 1454.0
+        },
+        "distribution": {
+          "immediate_under_1min": {
+            "count": 2,
+            "percentage": 28.6
+          },
+          "quick_1_to_5min": {
+            "count": 0,
+            "percentage": 0.0
+          },
+          "moderate_5_to_30min": {
+            "count": 0,
+            "percentage": 0.0
+          },
+          "slow_30min_to_2h": {
+            "count": 0,
+            "percentage": 0.0
+          },
+          "very_slow_over_2h": {
+            "count": 5,
+            "percentage": 71.4
+          }
+        }
+      },
+      {
+        "label": "Phone messages",
+        "count": 2491,
+        "statistics": {
+          "average_minutes": 4.6,
+          "median_minutes": 0.0,
+          "min_minutes": 0.0,
+          "max_minutes": 1480.4
+        },
+        "distribution": {
+          "immediate_under_1min": {
+            "count": 2420,
+            "percentage": 97.1
+          },
+          "quick_1_to_5min": {
+            "count": 17,
+            "percentage": 0.7
+          },
+          "moderate_5_to_30min": {
+            "count": 25,
+            "percentage": 1.0
+          },
+          "slow_30min_to_2h": {
+            "count": 10,
+            "percentage": 0.4
+          },
+          "very_slow_over_2h": {
+            "count": 19,
+            "percentage": 0.8
+          }
+        }
+      }
+    ]
+  },
+  "response_time_comparison": {
+    "me_average_minutes": 889.8,
+    "phone_average_minutes": 4.6,
+    "comparison": {
+      "me_vs_phone_ratio": 192.3,
+      "phone_vs_me_ratio": 0.0,
+      "faster_responder": "phone",
+      "speed_difference_factor": 192.3
+    }
+  },
+  "attachment_analysis": {
+    "total_attachments": 140,
+    "types": [
+      {
+        "mime_type": "Image(\"heic\")",
+        "count": 90,
+        "percentage": 64.3
+      },
+      {
+        "mime_type": "Unknown",
+        "count": 19,
+        "percentage": 13.6
+      },
+      {
+        "mime_type": "Video(\"quicktime\")",
+        "count": 13,
+        "percentage": 9.3
+      },
+      {
+        "mime_type": "Image(\"png\")",
+        "count": 9,
+        "percentage": 6.4
+      },
+      {
+        "mime_type": "Image(\"jpeg\")",
+        "count": 7,
+        "percentage": 5.0
+      },
+      {
+        "mime_type": "Application(\"pdf\")",
+        "count": 2,
+        "percentage": 1.4
+      }
+    ]
+  },
+  "date_distribution": {
+    "top_dates": [
+      {
+        "date": "2025-09-01",
+        "message_count": 1264
+      },
+      {
+        "date": "2025-07-19",
+        "message_count": 1173
+      },
+      {
+        "date": "2025-07-28",
+        "message_count": 1166
+      },
+      {
+        "date": "2025-08-28",
+        "message_count": 680
+      },
+      {
+        "date": "2025-07-29",
+        "message_count": 424
+      },
+      {
+        "date": "2025-08-16",
+        "message_count": 353
+      },
+      {
+        "date": "2025-07-30",
+        "message_count": 286
+      },
+      {
+        "date": "2025-07-31",
+        "message_count": 217
+      },
+      {
+        "date": "2025-03-15",
+        "message_count": 55
+      },
+      {
+        "date": "2025-07-10",
+        "message_count": 55
+      }
+    ]
+  },
+  "message_length_analysis": {
+    "shortest_message": 1,
+    "longest_message": 261,
+    "median_length": 21,
+    "empty_messages": {
+      "count": 0,
+      "percentage": 0.0
+    }
+  },
+  "content_analysis": {
+    "special_characters_emojis": {
+      "total_count": 2701,
+      "average_per_message": 0.4
+    },
+    "long_messages_over_200_chars": {
+      "count": 2,
+      "percentage": 0.0
+    }
+  }
+}
