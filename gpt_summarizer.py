@@ -7,6 +7,7 @@ Generates 3-sentence summaries for conversation segments using OpenAI's GPT-4.
 import json
 import sys
 import os
+import time
 from datetime import datetime
 import openai
 from dotenv import load_dotenv
@@ -15,8 +16,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration
-GPT_MODEL = "gpt-4o"  # Use GPT-4o (latest available model)
-MAX_TOKENS = 200
+GPT_MODEL = "gpt-5-mini"  # Use GPT-4o (latest available model)
+MAX_TOKENS = 1000  # Reduced from 100000 to stay within GPT-4o's 16,384 limit
 TEMPERATURE = 0.7
 DEFAULT_MAX_SEGMENTS = 3
 
@@ -57,7 +58,7 @@ def format_segment_for_gpt(segment):
         message_details.append(f"- {sender}: {content}")
     
     # Build the prompt
-    prompt = f"""Please provide a 3-sentence summary of this conversation segment:
+    prompt = f"""Please provide a summary of this conversation segment:
 
 Date: {date}
 Timeframe: {timeframe}
@@ -67,12 +68,12 @@ Message Count: {message_count}
 Conversation Content:
 {chr(10).join(message_details)}
 
-Please provide exactly 3 sentences that summarize:
-1. The main topic or purpose of this conversation, noting who initiated it
-2. The key points or developments discussed, highlighting the back-and-forth between "Me" and the other person
-3. The outcome or conclusion of the conversation, including who had the final say
+Please provide a short that summarize:
+1. The main topic or purpose of this conversation
+2. The key points or developments discussed
+3. The outcome or conclusion of the conversation
 
-Focus on the dynamic between the two participants and how the conversation flows between them.
+Focus on the dynamic between the two participants and how the relationship between them.
 
 Summary:"""
 
@@ -101,30 +102,48 @@ def generate_gpt_summary(segment, api_key=None, use_gpt=True):
         timeframe = "Unknown timeframe"
     
     if use_gpt and api_key:
-        try:
-            # Configure OpenAI client
-            client = openai.OpenAI(api_key=api_key)
-            
-            # Generate prompt
-            prompt = format_segment_for_gpt(segment)
-            
-            # Call GPT-4
-            response = client.chat.completions.create(
-                model=GPT_MODEL,
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that summarizes conversation segments in exactly 3 sentences, focusing on the dynamic between 'Me' and the other person."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=MAX_TOKENS,
-                temperature=TEMPERATURE
-            )
-            
-            summary = response.choices[0].message.content.strip()
-            
-        except Exception as e:
-            print(f"⚠️  GPT API error: {e}")
-            # Fall back to placeholder summary
-            summary = f"Conversation on {date} from {timeframe} involving {len(segment.get('participants', []))} participants. The exchange consisted of {segment.get('message_count', 0)} messages covering various topics. This appears to be a {'brief' if segment.get('message_count', 0) <= 5 else 'substantial'} conversation segment."
+        max_retries = 3
+        retry_delay = 1  # Start with 1 second delay
+        
+        for attempt in range(max_retries):
+            try:
+                # Configure OpenAI client
+                client = openai.OpenAI(api_key=api_key)
+                
+                # Generate prompt
+                prompt = format_segment_for_gpt(segment)
+                thread = client.beta.threads.create()
+                                # Call GPT
+                response = client.responses.create(
+                    model=GPT_MODEL,
+                    thread_id=thread.id,
+                    input=(
+                        "You are summarizes conversation segments "
+                        "focusing on the dynamic between 'Me' and someone else. "
+                        "If you've already figured out who the other person is, or me use their name."
+                        + prompt
+                    )
+                )
+                
+                # Get the summary from response
+                summary = getattr(response, "output_text", None)
+                break  # Success, exit retry loop
+                
+            except openai.RateLimitError as e:
+                if attempt < max_retries - 1:
+                    wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
+                    print(f"⚠️  Rate limit hit, waiting {wait_time}s before retry {attempt + 1}/{max_retries}")
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    print(f"⚠️  Rate limit exceeded after {max_retries} attempts")
+                    raise e
+            except Exception as e:
+                print(f"⚠️  GPT API error: {e}")
+                print(f"   📝 Falling back to placeholder summary due to API error")
+                # Fall back to placeholder summary
+                summary = f"Conversation on {date} from {timeframe} involving {len(segment.get('participants', []))} participants. The exchange consisted of {segment.get('message_count', 0)} messages covering various topics. This appears to be a {'brief' if segment.get('message_count', 0) <= 5 else 'substantial'} conversation segment."
+                break
     else:
         # Placeholder summary when GPT is not available
         summary = f"Conversation on {date} from {timeframe} involving {len(segment.get('participants', []))} participants. The exchange consisted of {segment.get('message_count', 0)} messages covering various topics. This appears to be a {'brief' if segment.get('message_count', 0) <= 5 else 'substantial'} conversation segment."

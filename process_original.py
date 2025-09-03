@@ -297,8 +297,15 @@ def split_concatenated_json(json_content):
     return records
 
 
-def segment_conversations(messages, time_window_hours=2):
-    """Segment conversations based on date and time gaps."""
+def segment_conversations(messages, time_window_hours=0):
+    """Segment conversations based on date and time gaps.
+    
+    Args:
+        messages: List of message dictionaries with timestamps
+        time_window_hours: Maximum time gap (in hours) before starting a new segment.
+                          Default is 0 (date-only grouping) to keep all conversations from the same day together.
+                          Set to a positive number (e.g., 8, 12, 24) for time-based splitting within days.
+    """
     
     if not messages:
         return []
@@ -345,9 +352,9 @@ def segment_conversations(messages, time_window_hours=2):
             current_msg = date_messages[i]
             prev_msg = date_messages[i-1]
             
-            # Check if within time window
+            # Check if within time window (or if grouping purely by date)
             time_diff = (current_msg['timestamp'] - prev_msg['timestamp']).total_seconds() / 3600
-            if time_diff <= time_window_hours:
+            if time_window_hours == 0 or time_diff <= time_window_hours:
                 # Continue current segment
                 current_segment['messages'].append(current_msg['record'])
                 current_segment['message_count'] += 1
@@ -422,8 +429,16 @@ def segment_conversations(messages, time_window_hours=2):
     return all_segments
 
 
-def process_original_file(input_file, output_file, time_window_hours=2):
-    """Process original concatenated JSON file directly to segmented JSONL."""
+def process_original_file(input_file, output_file, time_window_hours=0):
+    """Process original concatenated JSON file directly to segmented JSONL.
+    
+    Args:
+        input_file: Path to input JSON file
+        output_file: Path to output JSONL file
+        time_window_hours: Maximum time gap (in hours) before starting a new segment.
+                          Default is 8 hours to keep conversations from the same day together.
+                          Set to 0 to group purely by date without time-based splitting.
+    """
     
     try:
         with open(input_file, 'r', encoding='utf-8') as f:

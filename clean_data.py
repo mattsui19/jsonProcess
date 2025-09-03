@@ -37,7 +37,10 @@ def main():
     print(f"⏳ Processing...")
     
     # Process the file (cleaning + segmentation in one step)
-    process_original_file(input_file, output_file)
+    # Use date-only grouping (time_window_hours=0) to keep all conversations from the same day together
+    # Set to a positive number (e.g., 8, 12, 24) for time-based splitting within days
+    time_window_hours = 0
+    process_original_file(input_file, output_file, time_window_hours)
     
     print(f"\n✅ Processing complete!")
     print(f"📊 Output saved to: {output_file}")
